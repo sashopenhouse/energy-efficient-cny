@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Energy Savings Calculator | New York Sash</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red:    #CC0000;
+  --red-dk: #a30000;
+  --black:  #111;
+  --dark:   #1c1c1c;
+  --white:  #fff;
+  --off:    #f7f7f7;
+  --gray:   #666;
+  --lgray:  #f2f2f2;
+  --border: #e0e0e0;
+  --green:  #0a8c4e;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:'Open Sans',sans-serif; color:var(--black); background:var(--white); overflow-x:hidden; }
+
+/* ── STICKY BAR ── */
+.bar {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  background:var(--black); height:54px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 40px;
+  box-shadow:0 1px 12px rgba(0,0,0,.35);
+}
+.bar-logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
+.bar-logo svg { width:30px; height:30px; flex-shrink:0; }
+.bar-logo img {
+  width:auto; height:44px; flex-shrink:0;
+  display:block;
+  filter:brightness(0) invert(1);
+}
+.bar-right { display:flex; align-items:center; gap:20px; }
+.bar-phone {
+  font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600;
+  color:rgba(255,255,255,.5); text-decoration:none; letter-spacing:.03em;
+  display:flex; align-items:center; gap:7px; transition:color .15s;
+}
+.bar-phone:hover { color:var(--white); }
+.bar-cta {
+  background:var(--red); color:var(--white);
+  font-family:'Montserrat',sans-serif; font-size:11.5px; font-weight:800;
+  letter-spacing:.1em; text-transform:uppercase;
+  padding:9px 22px; border-radius:3px; text-decoration:none;
+  transition:background .15s; white-space:nowrap;
+}
+.bar-cta:hover { background:var(--red-dk); }
+@media(max-width:560px) { .bar-phone { display:none; } .bar { padding:0 20px; } }
+
+/* ── HERO ── */
+.hero {
+  background:var(--dark);
+  min-height:90vh;
+  display:flex; align-items:center; justify-content:center;
+  padding:110px 40px 72px;
+  position:relative; overflow:hidden;
+}
+
+/* subtle grid pattern */
+.hero::before {
+  content:'';
+  position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;
+}
+
+/* red bottom edge */
+.hero::after {
+  content:'';
+  position:absolute; left:0; right:0; bottom:0; height:4px;
+  background:var(--red);
+}
+
+.hero-inner {
+  max-width:860px; width:100%;
+  position:relative; z-index:2;
+  display:grid; grid-template-columns:1fr auto;
+  align-items:center; gap:60px;
+}
+@media(max-width:740px) {
+  .hero-inner { grid-template-columns:1fr; gap:40px; text-align:center; }
+}
+
+.hero-left {}
+
+.hero-tag {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(204,0,0,.15); border:1px solid rgba(204,0,0,.35);
+  color:var(--red); font-family:'Montserrat',sans-serif;
+  font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+  padding:6px 14px; border-radius:2px; margin-bottom:28px;
+}
+.hero-tag .pulse {
+  width:7px; height:7px; background:var(--red); border-radius:50%;
+  animation:pulse 1.6s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:.4; transform:scale(1.5);} }
+
+.hero h1 {
+  font-family:'Montserrat',sans-serif;
+  font-weight:900;
+  font-size:clamp(38px, 5.5vw, 68px);
+  line-height:1.08;
+  color:var(--white);
+  letter-spacing:-.01em;
+  margin-bottom:22px;
+}
+.hero h1 .accent { color:var(--red); }
+
+.hero-desc {
+  font-size:17px; color:rgba(255,255,255,.55);
+  line-height:1.75; max-width:480px; margin-bottom:36px;
+}
+@media(max-width:740px) { .hero-desc { margin:0 auto 36px; } }
+
+.hero-actions { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+@media(max-width:740px) { .hero-actions { justify-content:center; } }
+
+.btn-primary {
+  background:var(--red); color:var(--white);
+  font-family:'Montserrat',sans-serif; font-size:13px; font-weight:800;
+  letter-spacing:.09em; text-transform:uppercase;
+  padding:16px 36px; border-radius:3px;
+  text-decoration:none; border:none; cursor:pointer;
+  display:inline-flex; align-items:center; gap:10px;
+  transition:all .18s;
+  box-shadow:0 4px 24px rgba(204,0,0,.35);
+}
+.btn-primary:hover { background:var(--red-dk); transform:translateY(-1px); box-shadow:0 6px 32px rgba(204,0,0,.45); }
+.btn-primary svg { transition:transform .18s; }
+.btn-primary:hover svg { transform:translateX(3px); }
+
+.hero-trust {
+  font-family:'Montserrat',sans-serif; font-size:12px;
+  font-weight:600; color:rgba(255,255,255,.3); letter-spacing:.04em;
+}
+.hero-trust strong { color:rgba(255,255,255,.55); }
+
+/* right side card */
+.hero-card {
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:8px; padding:28px 24px;
+  display:flex; flex-direction:column; gap:20px;
+  min-width:220px;
+}
+@media(max-width:740px) { .hero-card { flex-direction:row; flex-wrap:wrap; justify-content:center; gap:16px; } }
+
+.hc-stat { text-align:center; }
+.hc-num {
+  font-family:'Montserrat',sans-serif; font-weight:900;
+  font-size:36px; color:var(--white); line-height:1; margin-bottom:4px;
+}
+.hc-num span { color:var(--red); }
+.hc-lbl {
+  font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
+  letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.35);
+}
+.hc-divider { height:1px; background:rgba(255,255,255,.08); }
+@media(max-width:740px) { .hc-divider { display:none; } }
+
+/* ── RED BAND ── */
+.band {
+  background:var(--red); padding:16px 40px;
+  font-family:'Montserrat',sans-serif; font-size:13.5px; font-weight:700;
+  color:var(--white); text-align:center; letter-spacing:.03em;
+}
+
+/* ── CALCULATOR ── */
+.calc-section {
+  background:var(--lgray); padding:80px 40px;
+  position:relative; overflow:hidden;
+}
+.calc-section::after {
+  content:'';
+  position:absolute; right:0; top:0; bottom:0; width:4px;
+  background:var(--red);
+}
+
+.section-label {
+  font-family:'Montserrat',sans-serif; font-size:11px; font-weight:800;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--red);
+  display:block; margin-bottom:10px;
+}
+.section-heading {
+  font-family:'Montserrat',sans-serif; font-weight:900;
+  font-size:clamp(26px, 4vw, 42px); line-height:1.1;
+  color:var(--black); margin-bottom:12px;
+}
+.section-heading span { color:var(--red); }
+.section-sub { font-size:16px; color:var(--gray); line-height:1.7; max-width:520px; }
+
+.calc-body {
+  max-width:960px; margin:52px auto 0;
+  display:grid; grid-template-columns:1fr 1fr;
+  border-radius:8px; overflow:hidden;
+  box-shadow:0 4px 40px rgba(0,0,0,.1);
+  border:1px solid var(--border);
+}
+@media(max-width:740px) { .calc-body { grid-template-columns:1fr; } }
+
+/* form */
+.cform {
+  background:var(--white);
+  padding:44px 40px;
+}
+@media(max-width:480px) { .cform { padding:32px 24px; } }
+
+.cform-title {
+  font-family:'Montserrat',sans-serif; font-weight:800; font-size:14px;
+  text-transform:uppercase; letter-spacing:.1em; color:var(--black);
+  margin-bottom:32px; padding-bottom:16px;
+  border-bottom:2px solid var(--lgray);
+}
+
+.field { margin-bottom:22px; }
+.field label {
+  display:block; font-family:'Montserrat',sans-serif; font-size:10.5px;
+  font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  color:#999; margin-bottom:7px;
+}
+.field select,
+.field input[type=number] {
+  width:100%; border:1.5px solid var(--border); border-radius:4px;
+  padding:13px 14px; font-family:'Open Sans',sans-serif; font-size:15px;
+  line-height:1.2; min-height:46px;
+  color:var(--black); background:var(--white); outline:none;
+  transition:border-color .15s; appearance:none; -webkit-appearance:none;
+}
+.field select { line-height:1.35; padding-top:14px; padding-bottom:14px; }
+.field select:focus,
+.field input[type=number]:focus { border-color:var(--red); box-shadow:0 0 0 3px rgba(204,0,0,.08); }
+.sel-wrap { position:relative; }
+.sel-wrap::after { content:'▾'; position:absolute; right:14px; top:50%; transform:translateY(-50%); pointer-events:none; color:#bbb; font-size:13px; }
+
+.range-wrap { padding-top:4px; display:flex; align-items:center; gap:12px; }
+.range-wrap input[type=range] {
+  flex:1; -webkit-appearance:none; height:4px;
+  background:linear-gradient(90deg, var(--red) 0%, var(--red) var(--p,33%), var(--border) var(--p,33%));
+  border-radius:2px; outline:none; cursor:pointer;
+}
+.range-wrap input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:20px; height:20px;
+  background:var(--white); border:2.5px solid var(--red); border-radius:50%;
+  cursor:pointer; box-shadow:0 1px 6px rgba(204,0,0,.25);
+}
+.range-val {
+  font-family:'Montserrat',sans-serif; font-weight:900; font-size:22px;
+  color:var(--red); min-width:30px; text-align:right;
+}
+
+.calc-btn {
+  width:100%; background:var(--black); color:var(--white); border:none;
+  padding:16px; border-radius:4px;
+  font-family:'Montserrat',sans-serif; font-size:13px; font-weight:800;
+  letter-spacing:.1em; text-transform:uppercase;
+  cursor:pointer; margin-top:6px;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  transition:background .15s;
+}
+.calc-btn:hover { background:#2a2a2a; }
+
+/* results */
+.cresults {
+  background:var(--black); padding:44px 40px;
+  display:flex; flex-direction:column;
+}
+@media(max-width:480px) { .cresults { padding:32px 24px; } }
+
+.res-idle {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center; gap:16px;
+}
+.res-idle-graphic {
+  width:180px; height:120px; position:relative;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+  padding:12px;
+  border-radius:10px;
+  background:linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 12px 28px rgba(0,0,0,.25);
+}
+.res-idle-card {
+  border-radius:6px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  display:flex; align-items:flex-end; justify-content:center;
+  overflow:hidden;
+}
+.res-idle-meter {
+  width:100%; height:30%;
+  background:linear-gradient(180deg, #f4a832, #1db863);
+  opacity:.7;
+  animation:idleFill 2.6s ease-in-out infinite;
+}
+.res-idle-card:nth-child(2) .res-idle-meter { height:55%; animation-delay:.2s; }
+.res-idle-card:nth-child(3) .res-idle-meter { height:75%; animation-delay:.4s; }
+.res-idle-title {
+  font-family:'Montserrat',sans-serif; font-weight:800; font-size:14px;
+  color:rgba(255,255,255,.75); letter-spacing:.06em; text-transform:uppercase;
+}
+.res-idle-text {
+  font-family:'Open Sans',sans-serif; font-weight:500; font-size:14px;
+  color:rgba(255,255,255,.35); line-height:1.6; max-width:240px;
+}
+@keyframes idleFill { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+
+.res-live { display:none; flex-direction:column; }
+
+.res-kicker {
+  font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
+  letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.3);
+  margin-bottom:4px;
+}
+.res-number {
+  font-family:'Montserrat',sans-serif; font-weight:900;
+  font-size:68px; line-height:1; color:#1db863;
+  margin-bottom:4px;
+  animation:numIn .45s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes numIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+.res-sub {
+  font-size:13px; color:rgba(255,255,255,.35);
+  margin-bottom:28px; font-family:'Montserrat',sans-serif; font-weight:600;
+}
+
+.res-rows { margin-bottom:24px; flex:1; }
+.res-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:11px 0; border-bottom:1px solid rgba(255,255,255,.07); font-size:14px;
+}
+.res-row:last-child { border-bottom:none; }
+.rr-label { color:rgba(255,255,255,.4); }
+.rr-val { font-family:'Montserrat',sans-serif; font-weight:800; font-size:15px; }
+.green  { color:#1db863; }
+.amber  { color:#f4a832; }
+.white  { color:var(--white); }
+
+.res-bar { margin-bottom:24px; }
+.rb-head {
+  display:flex; justify-content:space-between;
+  font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:rgba(255,255,255,.25); margin-bottom:8px;
+}
+.rb-track { background:rgba(255,255,255,.08); border-radius:2px; height:7px; overflow:hidden; }
+.rb-fill { height:100%; background:linear-gradient(90deg, var(--red), #f4a832, #1db863); border-radius:2px; width:0; transition:width .9s cubic-bezier(.34,1.56,.64,1); }
+
+.res-cta {
+  display:block; background:var(--red); color:var(--white);
+  text-align:center; padding:15px; border-radius:4px;
+  font-family:'Montserrat',sans-serif; font-size:13px; font-weight:800;
+  letter-spacing:.09em; text-transform:uppercase; text-decoration:none;
+  transition:background .15s; box-shadow:0 3px 16px rgba(204,0,0,.35);
+}
+.res-cta:hover { background:var(--red-dk); }
+.res-fine {
+  font-size:11px; color:rgba(255,255,255,.18);
+  margin-top:14px; line-height:1.55;
+}
+
+/* ── PAIN ── */
+.pain-section { background:var(--white); padding:80px 40px; }
+.pain-grid {
+  max-width:960px; margin:52px auto 0;
+  display:grid; grid-template-columns:repeat(2,1fr); gap:24px;
+}
+@media(max-width:620px) { .pain-grid { grid-template-columns:1fr; } }
+
+.pain-card {
+  border:1.5px solid var(--border); border-radius:6px; padding:32px;
+  position:relative; overflow:hidden;
+  transition:border-color .2s, transform .2s, box-shadow .2s;
+}
+.pain-card:hover { border-color:rgba(204,0,0,.4); transform:translateY(-3px); box-shadow:0 10px 32px rgba(0,0,0,.07); }
+.pain-card::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:var(--red); }
+.pain-num {
+  font-family:'Montserrat',sans-serif; font-weight:900; font-size:42px;
+  color:rgba(204,0,0,.1); line-height:1; margin-bottom:8px;
+}
+.pain-title {
+  font-family:'Montserrat',sans-serif; font-weight:800; font-size:15px;
+  text-transform:uppercase; letter-spacing:.05em; margin-bottom:10px;
+}
+.pain-body { font-size:14px; color:var(--gray); line-height:1.7; }
+
+/* ── PRODUCT ── */
+.product-section { background:var(--black); padding:80px 40px; }
+.feat-grid {
+  max-width:960px; margin:52px auto 0;
+  display:grid; grid-template-columns:repeat(2,1fr); gap:2px;
+  background:#2a2a2a; border-radius:6px; overflow:hidden;
+}
+@media(max-width:620px) { .feat-grid { grid-template-columns:1fr; } }
+
+.feat-tile {
+  background:#181818; padding:32px 28px;
+  display:flex; gap:18px; align-items:flex-start;
+  transition:background .2s;
+}
+.feat-tile:hover { background:#1f1f1f; }
+.feat-icon {
+  width:46px; height:46px; background:var(--red); border-radius:4px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; flex-shrink:0;
+}
+.feat-tag {
+  font-family:'Montserrat',sans-serif; font-size:9.5px; font-weight:800;
+  letter-spacing:.14em; text-transform:uppercase; color:rgba(204,0,0,.7);
+  display:block; margin-bottom:5px;
+}
+.feat-title {
+  font-family:'Montserrat',sans-serif; font-weight:800; font-size:14px;
+  text-transform:uppercase; letter-spacing:.04em;
+  color:var(--white); margin-bottom:8px;
+}
+.feat-body { font-size:13.5px; color:rgba(255,255,255,.4); line-height:1.65; }
+.feat-explore {
+  text-align:center; margin-top:36px;
+  position:relative; z-index:2;
+}
+.feat-explore a {
+  color:rgba(255,255,255,.3); font-family:'Montserrat',sans-serif;
+  font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  text-decoration:none; border-bottom:1px solid rgba(255,255,255,.12); padding-bottom:2px;
+  transition:color .15s, border-color .15s;
+}
+.feat-explore a:hover { color:rgba(255,255,255,.65); border-color:rgba(255,255,255,.3); }
+
+/* ── PROOF ── */
+.proof-section { background:var(--lgray); padding:80px 40px; }
+.proof-grid {
+  max-width:960px; margin:52px auto 0;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:20px;
+}
+@media(max-width:800px) { .proof-grid { grid-template-columns:1fr; } }
+
+.proof-card {
+  background:var(--white); border-radius:6px; padding:28px;
+  border:1.5px solid var(--border);
+  position:relative; transition:box-shadow .2s;
+}
+.proof-card:hover { box-shadow:0 6px 28px rgba(0,0,0,.07); }
+.proof-quote {
+  font-family:Georgia,serif; font-size:48px; color:var(--red); opacity:.12;
+  position:absolute; top:12px; right:16px; line-height:1;
+}
+.proof-stars { color:var(--red); font-size:13px; margin-bottom:12px; }
+.proof-text { font-size:14px; color:#444; line-height:1.7; margin-bottom:18px; }
+.proof-name { font-family:'Montserrat',sans-serif; font-weight:800; font-size:13px; color:var(--black); }
+.proof-loc { font-size:12px; color:var(--gray); }
+
+/* ── BOTTOM CTA ── */
+.bottom-cta {
+  background:var(--red); padding:88px 40px; text-align:center;
+  position:relative; overflow:hidden;
+}
+.bottom-cta::before {
+  content:'';
+  position:absolute; inset:0;
+  background:repeating-linear-gradient(-55deg, transparent, transparent 18px, rgba(0,0,0,.05) 18px, rgba(0,0,0,.05) 19px);
+  pointer-events:none;
+}
+.bottom-cta h2 {
+  font-family:'Montserrat',sans-serif; font-weight:900;
+  font-size:clamp(32px, 6vw, 72px); line-height:1.05;
+  color:var(--white); margin-bottom:18px;
+  position:relative; z-index:2; letter-spacing:-.01em;
+}
+.bottom-cta p {
+  font-size:17px; color:rgba(255,255,255,.75);
+  max-width:480px; margin:0 auto 40px; line-height:1.7;
+  position:relative; z-index:2;
+}
+.btn-white {
+  background:var(--white); color:var(--red);
+  font-family:'Montserrat',sans-serif; font-size:14px; font-weight:800;
+  letter-spacing:.09em; text-transform:uppercase;
+  padding:18px 48px; border-radius:3px; text-decoration:none;
+  display:inline-flex; align-items:center; gap:12px;
+  transition:all .18s; position:relative; z-index:2;
+  box-shadow:0 4px 24px rgba(0,0,0,.18);
+}
+.btn-white:hover { background:var(--black); color:var(--white); transform:translateY(-2px); }
+.bcta-phone {
+  display:block; margin-top:20px;
+  color:rgba(255,255,255,.5); font-family:'Montserrat',sans-serif;
+  font-size:13px; font-weight:600; text-decoration:none;
+  letter-spacing:.03em; position:relative; z-index:2;
+}
+.bcta-phone strong { color:rgba(255,255,255,.8); }
+.bcta-phone:hover strong { color:var(--white); }
+
+/* ── FOOTER ── */
+.foot {
+  background:var(--black); padding:20px 40px;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+}
+.foot-brand { font-family:'Montserrat',sans-serif; font-weight:700; font-size:12px; color:rgba(255,255,255,.25); letter-spacing:.06em; text-transform:uppercase; }
+.foot-links { display:flex; gap:20px; flex-wrap:wrap; }
+.foot-links a { font-size:12px; color:rgba(255,255,255,.3); text-decoration:none; font-family:'Montserrat',sans-serif; font-weight:600; letter-spacing:.04em; transition:color .15s; }
+.foot-links a:hover { color:rgba(255,255,255,.65); }
+
+/* ── REVEAL ── */
+.rv { opacity:0; transform:translateY(22px); transition:opacity .55s ease, transform .55s ease; }
+.rv.in { opacity:1; transform:translateY(0); }
+.d1 { transition-delay:.1s; } .d2 { transition-delay:.2s; } .d3 { transition-delay:.3s; }
+
+@media(max-width:480px) { .bar { padding:0 16px; } .hero { padding:100px 20px 64px; } .calc-section,.pain-section,.product-section,.proof-section,.bottom-cta,.foot { padding-left:20px; padding-right:20px; } }
+</style>
+</head>
+<body>
+
+<!-- STICKY BAR -->
+<div class="bar">
+  <a href="https://newyorksash.com" class="bar-logo">
+    <img src="logo.png" alt="New York Sash logo">
+  </a>
+  <div class="bar-right">
+    <a href="tel:+13156247344" class="bar-phone">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" fill="rgba(255,255,255,.5)"/></svg>
+      (315) 624-7344
+    </a>
+    <a href="https://newyorksash.com/contact" class="bar-cta">Get Free Quote →</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="hero-tag">
+        <span class="pulse"></span>
+        CNY Winter Energy Alert
+      </div>
+      <h1>
+        Stop Paying to<br>
+        Heat the <span class="accent">Outside.</span>
+      </h1>
+      <p class="hero-desc">
+        Last winter, Central New York heating bills surged over 30%. Old windows are responsible for up to 25% of that heat loss. Calculate exactly what new windows would save you — in under a minute.
+      </p>
+      <div class="hero-actions">
+        <a href="#calculator" class="btn-primary">
+          Calculate My Savings
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <span class="hero-trust">★★★★★ &nbsp;<strong>Trusted since 1989</strong></span>
+      </div>
+    </div>
+
+    <div class="hero-card">
+      <div class="hc-stat">
+        <div class="hc-num">25<span>%</span></div>
+        <div class="hc-lbl">Heat lost through windows</div>
+      </div>
+      <div class="hc-divider"></div>
+      <div class="hc-stat">
+        <div class="hc-num">$<span>600</span></div>
+        <div class="hc-lbl">Avg. annual overpayment</div>
+      </div>
+      <div class="hc-divider"></div>
+      <div class="hc-stat">
+        <div class="hc-num">12<span>%</span></div>
+        <div class="hc-lbl">Avg. bill reduction</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BAND -->
+<div class="band">
+  CNY's trusted window experts since 1989 — energy-efficient windows custom-built for Central New York winters.
+</div>
+
+<!-- CALCULATOR -->
+<section class="calc-section" id="calculator">
+  <div style="max-width:960px; margin:0 auto;">
+    <span class="section-label">Free Savings Estimate</span>
+    <h2 class="section-heading">See What You Could<br>Save This Winter</h2>
+    <p class="section-sub">Answer 4 quick questions and get a personalized annual savings estimate — instantly.</p>
+  </div>
+
+  <div class="calc-body">
+    <div class="cform">
+      <div class="cform-title">Your Home Details</div>
+
+      <div class="field">
+        <label>Home Size</label>
+        <div class="sel-wrap">
+          <select id="hSize">
+            <option value="">Select square footage</option>
+            <option value="800">Under 1,000 sq ft</option>
+            <option value="1300">1,000 – 1,500 sq ft</option>
+            <option value="1800">1,500 – 2,000 sq ft</option>
+            <option value="2500">2,000 – 3,000 sq ft</option>
+            <option value="3500">Over 3,000 sq ft</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Current Window Condition</label>
+        <div class="sel-wrap">
+          <select id="wType">
+            <option value="">Select window type / age</option>
+            <option value="0.85">Single-pane (original to house)</option>
+            <option value="0.58">Double-pane, 15+ years old</option>
+            <option value="0.36">Double-pane, 5–15 years old</option>
+            <option value="0.20">Triple-pane or recent upgrade</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Number of Windows — <span id="nwLabel" style="color:var(--red); font-family:Montserrat,sans-serif; font-weight:900;">12</span></label>
+        <div class="range-wrap">
+          <span style="font-size:11px; color:#bbb;">4</span>
+          <input type="range" id="nWin" min="4" max="30" value="12" style="--p:33%"
+            oninput="document.getElementById('nwLabel').textContent=this.value; const p=((this.value-4)/26)*100; this.style.setProperty('--p',p+'%');">
+          <span style="font-size:11px; color:#bbb;">30</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Average Monthly Heating Bill (Winter)</label>
+        <input type="number" id="hBill" placeholder="e.g.  $280" min="50" max="900">
+      </div>
+
+      <button class="calc-btn" onclick="runCalc()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1" stroke="white" stroke-width="2"/><rect x="13" y="4" width="7" height="7" rx="1" stroke="white" stroke-width="2"/><rect x="4" y="13" width="7" height="7" rx="1" stroke="white" stroke-width="2"/><rect x="13" y="13" width="7" height="7" rx="1" stroke="white" stroke-width="2"/></svg>
+        Show My Savings
+      </button>
+    </div>
+
+    <div class="cresults" id="cRes">
+      <div class="res-idle" id="rIdle">
+        <div class="res-idle-graphic" aria-hidden="true">
+          <div class="res-idle-card"><div class="res-idle-meter"></div></div>
+          <div class="res-idle-card"><div class="res-idle-meter"></div></div>
+          <div class="res-idle-card"><div class="res-idle-meter"></div></div>
+        </div>
+        <div class="res-idle-title">Instant Savings Preview</div>
+        <div class="res-idle-text">Answer the 4 questions to reveal your monthly and annual savings estimate.</div>
+      </div>
+      <div class="res-live" id="rLive">
+        <div class="res-kicker">Estimated Annual Savings</div>
+        <div class="res-number" id="rNum">$0</div>
+        <div class="res-sub">with New York Sash ENERGY STAR windows</div>
+        <div class="res-rows">
+          <div class="res-row"><span class="rr-label">Monthly reduction</span><span class="rr-val green" id="rMo">—</span></div>
+          <div class="res-row"><span class="rr-label">5-year total savings</span><span class="rr-val amber" id="r5">—</span></div>
+          <div class="res-row"><span class="rr-label">Heat loss reduction</span><span class="rr-val white" id="rHL">—</span></div>
+          <div class="res-row"><span class="rr-label">Est. payback period</span><span class="rr-val white" id="rPB">—</span></div>
+        </div>
+        <div class="res-bar">
+          <div class="rb-head"><span>Current efficiency</span><span>After upgrade</span></div>
+          <div class="rb-track"><div class="rb-fill" id="rFill"></div></div>
+        </div>
+        <a href="https://newyorksash.com/contact" class="res-cta">Get My Free Quote →</a>
+        <p class="res-fine">*Estimates based on DOE &amp; ENERGY STAR data for Northern climate zones. Schedule a free in-home visit for precise numbers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN -->
+<section class="pain-section">
+  <div style="max-width:960px; margin:0 auto;">
+    <span class="section-label rv">The Problem</span>
+    <h2 class="section-heading rv">CNY Winters Are Brutal.<br>Old Windows Make Them <span>Expensive.</span></h2>
+  </div>
+  <div class="pain-grid">
+    <div class="pain-card rv">
+      <div class="pain-num">01</div>
+      <div class="pain-title">Drafts & Cold Spots</div>
+      <p class="pain-body">That chill near your windows in January isn't just discomfort — it's your furnace running nonstop every night trying to compensate for heat pouring out through the glass.</p>
+    </div>
+    <div class="pain-card rv d1">
+      <div class="pain-num">02</div>
+      <div class="pain-title">Heating Bills That Won't Quit</div>
+      <p class="pain-body">Single-pane and aging double-pane windows lose heat aggressively at -10°F windchills. The exact conditions CNY delivers every January and February.</p>
+    </div>
+    <div class="pain-card rv d2">
+      <div class="pain-num">03</div>
+      <div class="pain-title">Condensation & Ice on Glass</div>
+      <p class="pain-body">Frost forming inside your windows is a red flag — it means thermal transfer is so severe your glass is reaching dew point, which leads to mold, rot, and frame damage.</p>
+    </div>
+    <div class="pain-card rv d3">
+      <div class="pain-num">04</div>
+      <div class="pain-title">Incentives You're Missing</div>
+      <p class="pain-body">ENERGY STAR certified window upgrades qualify for federal tax credits and NY state rebate programs. Every month with old windows is money you're leaving on the table.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCT -->
+<section class="product-section">
+  <div style="max-width:960px; margin:0 auto;">
+    <span class="section-label rv" style="color:rgba(204,0,0,.75);">New York Sash Windows</span>
+    <h2 class="section-heading rv" style="color:var(--white);">Built for Central<br>New York. <span>Period.</span></h2>
+    <p class="section-sub rv" style="color:rgba(255,255,255,.4);">Custom-manufactured for your home and CNY's climate extremes — not imported, not generic.</p>
+  </div>
+  <div class="feat-grid rv">
+    <div class="feat-tile">
+      <div class="feat-icon">🔗</div>
+      <div>
+        <span class="feat-tag">Technology</span>
+        <div class="feat-title">Fusion-Welded Frames</div>
+        <p class="feat-body">Corners thermally welded, not screwed — airtight from -15°F to 90°F.</p>
+      </div>
+    </div>
+    <div class="feat-tile">
+      <div class="feat-icon">❄️</div>
+      <div>
+        <span class="feat-tag">Insulation</span>
+        <div class="feat-title">LowE Glass + Argon Fill</div>
+        <p class="feat-body">LowE coating keeps heat in. Argon gas between panes stops thermal transfer cold.</p>
+      </div>
+    </div>
+    <div class="feat-tile">
+      <div class="feat-icon">⭐</div>
+      <div>
+        <span class="feat-tag">Certified</span>
+        <div class="feat-title">ENERGY STAR Certified</div>
+        <p class="feat-body">Northern climate zone certified. Qualifies for federal tax credits and NY rebates.</p>
+      </div>
+    </div>
+    <div class="feat-tile">
+      <div class="feat-icon">🛡️</div>
+      <div>
+        <span class="feat-tag">Warranty</span>
+        <div class="feat-title">Lifetime Warranty</div>
+        <p class="feat-body">Family-owned in CNY since 1989. We're here for every window we've ever installed.</p>
+      </div>
+    </div>
+  </div>
+  <div class="feat-explore">
+    <a href="https://newyorksash.com/windows">Explore all window options →</a>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section class="proof-section">
+  <div style="max-width:960px; margin:0 auto;">
+    <span class="section-label rv">CNY Homeowners</span>
+    <h2 class="section-heading rv">Real People. <span>Real Savings.</span></h2>
+  </div>
+  <div class="proof-grid">
+    <div class="proof-card rv">
+      <div class="proof-quote">"</div>
+      <div class="proof-stars">★★★★★</div>
+      <p class="proof-text">Our heating bill dropped noticeably the very first month. The house feels warmer — no more cold spots near the windows. Best investment we've made in this house.</p>
+      <div class="proof-name">Sarah H.</div>
+      <div class="proof-loc">Utica, NY</div>
+    </div>
+    <div class="proof-card rv d1">
+      <div class="proof-quote">"</div>
+      <div class="proof-stars">★★★★★</div>
+      <p class="proof-text">I was skeptical but our gas bill was $60 less the first winter. After two winters the windows have basically paid for themselves compared to what we were spending before.</p>
+      <div class="proof-name">Joe B.</div>
+      <div class="proof-loc">Sauquoit, NY</div>
+    </div>
+    <div class="proof-card rv d2">
+      <div class="proof-quote">"</div>
+      <div class="proof-stars">★★★★★</div>
+      <p class="proof-text">Done in one day, spotless job site. What I didn't expect was how much quieter the house got too. No more drafts, no more cold spots. Worth it for CNY winters alone.</p>
+      <div class="proof-name">Raymond & Laura B.</div>
+      <div class="proof-loc">New Hartford, NY</div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM CTA -->
+<section class="bottom-cta">
+  <h2>Ready to Stop the Heat Loss?</h2>
+  <p>Get your free in-home consultation and custom savings estimate. No pressure, no obligation — just honest answers from Central New York's window experts since 1989.</p>
+  <a href="https://newyorksash.com/contact" class="btn-white">
+    Start My Free Quote
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+  <a href="tel:+13156247344" class="bcta-phone">or call us — <strong>(315) 624-7344</strong></a>
+</section>
+
+<!-- FOOTER -->
+<div class="foot">
+  <span class="foot-brand">© 2025 New York Sash · Whitesboro, NY</span>
+  <div class="foot-links">
+    <a href="https://newyorksash.com/windows">Windows</a>
+    <a href="https://newyorksash.com/contact">Free Estimate</a>
+    <a href="https://newyorksash.com/warranty">Warranty</a>
+    <a href="https://newyorksash.com">NewYorkSash.com</a>
+  </div>
+</div>
+
+<script>
+function runCalc() {
+  const hs = parseInt(document.getElementById('hSize').value) || 0;
+  const wl = parseFloat(document.getElementById('wType').value) || 0;
+  const nw = parseInt(document.getElementById('nWin').value) || 12;
+  const bl = parseFloat(document.getElementById('hBill').value) || 0;
+  if (!hs || !wl || !bl) { alert('Please fill in all fields to see your savings.'); return; }
+  const imp = wl - 0.18;
+  const hlp = Math.round((imp / wl) * 100);
+  const sav = Math.round(bl * 6 * (0.17 + wl * 0.08) * (imp / wl));
+  const mo  = Math.round(sav / 6);
+  document.getElementById('rIdle').style.display = 'none';
+  const live = document.getElementById('rLive');
+  live.style.display = 'flex';
+  document.getElementById('rNum').textContent = '$' + sav.toLocaleString();
+  document.getElementById('rMo').textContent  = '$' + mo + ' / mo';
+  document.getElementById('r5').textContent   = '$' + (sav * 5).toLocaleString();
+  document.getElementById('rHL').textContent  = hlp + '% less heat loss';
+  document.getElementById('rPB').textContent  = sav > 0 ? ((nw * 420) / sav).toFixed(1) + ' yrs' : '—';
+  setTimeout(() => { document.getElementById('rFill').style.width = '88%'; }, 350);
+  if (window.innerWidth < 740) document.getElementById('cRes').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+}, { threshold: .12 });
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+</script>
+</body>
+</html>
