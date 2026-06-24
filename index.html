@@ -238,7 +238,8 @@ body { font-family:'Open Sans',sans-serif; color:var(--black); background:var(--
   color:#999; margin-bottom:7px;
 }
 .field select,
-.field input[type=number] {
+.field input[type=number],
+.field input[type=email] {
   width:100%; border:1.5px solid var(--border); border-radius:4px;
   padding:13px 14px; font-family:'Open Sans',sans-serif; font-size:15px;
   line-height:1.2; min-height:46px;
@@ -247,7 +248,8 @@ body { font-family:'Open Sans',sans-serif; color:var(--black); background:var(--
 }
 .field select { line-height:1.35; padding-top:14px; padding-bottom:14px; }
 .field select:focus,
-.field input[type=number]:focus { border-color:var(--red); box-shadow:0 0 0 3px rgba(204,0,0,.08); }
+.field input[type=number]:focus,
+.field input[type=email]:focus { border-color:var(--red); box-shadow:0 0 0 3px rgba(204,0,0,.08); }
 .sel-wrap { position:relative; }
 .sel-wrap::after { content:'▾'; position:absolute; right:14px; top:50%; transform:translateY(-50%); pointer-events:none; color:#bbb; font-size:13px; }
 
@@ -645,6 +647,11 @@ body { font-family:'Open Sans',sans-serif; color:var(--black); background:var(--
         <input type="number" id="hBill" placeholder="e.g.  $280" min="50" max="900">
       </div>
 
+      <div class="field">
+        <label>Email Address</label>
+        <input type="email" id="uEmail" placeholder="e.g.  you@example.com" required>
+      </div>
+
       <button class="calc-btn" onclick="runCalc()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1" stroke="white" stroke-width="2"/><rect x="13" y="4" width="7" height="7" rx="1" stroke="white" stroke-width="2"/><rect x="4" y="13" width="7" height="7" rx="1" stroke="white" stroke-width="2"/><rect x="13" y="13" width="7" height="7" rx="1" stroke="white" stroke-width="2"/></svg>
         Show My Savings
@@ -817,11 +824,43 @@ function runCalc() {
   const wl = parseFloat(document.getElementById('wType').value) || 0;
   const nw = parseInt(document.getElementById('nWin').value) || 12;
   const bl = parseFloat(document.getElementById('hBill').value) || 0;
+  const email = (document.getElementById('uEmail').value || '').trim();
+
   if (!hs || !wl || !bl) { alert('Please fill in all fields to see your savings.'); return; }
+  if (!email) { alert('Please enter your email address to see your savings.'); return; }
+
+  // Basic email pattern check
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) { alert('Please enter a valid email address.'); return; }
+
   const imp = wl - 0.18;
   const hlp = Math.round((imp / wl) * 100);
   const sav = Math.round(bl * 6 * (0.17 + wl * 0.08) * (imp / wl));
   const mo  = Math.round(sav / 6);
+
+  // Track lead conversion
+  if (typeof window.nysTrack === 'function') {
+    window.nysTrack('calc_lead', {
+      email: email,
+      home_size: hs,
+      window_condition: wl,
+      num_windows: nw,
+      monthly_bill: bl,
+      savings_annual: sav
+    });
+  }
+
+  // Update all quote links to include the email query parameter
+  document.querySelectorAll('a[href*="newyorksash.com/quote"]').forEach(a => {
+    try {
+      const url = new URL(a.href);
+      url.searchParams.set('email', email);
+      a.href = url.toString();
+    } catch (e) {
+      a.href = "https://newyorksash.com/quote?email=" + encodeURIComponent(email);
+    }
+  });
+
   document.getElementById('rIdle').style.display = 'none';
   const live = document.getElementById('rLive');
   live.style.display = 'flex';
